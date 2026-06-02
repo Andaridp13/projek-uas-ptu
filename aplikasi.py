@@ -25,7 +25,7 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 22050
 CHUNK = 1024
-DURASI_REKAM = 2.0
+DURASI_REKAM = 1.5
 FILE_SEMENTARA = 'rekaman_sementara.wav'
 ONSET_PRE = 0.1
 DURASI_TRIM = 1.0
@@ -44,6 +44,11 @@ with open(os.path.join(FOLDER_MODEL, 'scaler.pkl'), 'rb') as f:
 
 # inisialisasi mixer buat muter suara hasil tts
 pygame.mixer.init()
+# warmup librosa saat aplikasi dibuka supaya prediksi pertama tidak lambat
+def warmup():
+    dummy = np.zeros(22050)
+    librosa.feature.mfcc(y=dummy, sr=22050, n_mfcc=40)
+threading.Thread(target=warmup, daemon=True).start()
 
 def get_file_temp(ekstensi='mp3'):
     # generate nama file random di folder temp biar ga nabrak file lama
